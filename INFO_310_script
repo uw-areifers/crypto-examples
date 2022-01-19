@@ -1,0 +1,21 @@
+ #Alice has a secret message to send to bob so she first uses symmetric cryptography to encrypt the message
+1. python symmetric_encryption.py -k alicesrandosecretkey -m 'alices original message that she wants to send across the globe to bob'
+
+Alice then uses asymmetric cryptography to encrypt the key she used within the symmetric cryptography
+2. python asymmetric_encryption.py -k bobs_public_key.pem -pt alicesrandosecretkey -of alices_encrypted_symmetric_key.txt
+
+Alice packages up both the asymmetrically encrypted key and the symmetrically encrypted message together.
+3. Zip encrypted message and session key together
+
+Before alice ships the digital envelope to bob she hashes and signs her original message so that bob can validate it both came from her and has not been altered
+4. python hash.py -m 'alices original message that she wants to send across the globe to bob'
+
+Sign the message that was just hashed with Alices private key so that Bob can use her public key to validate it came from her
+5. python sign.py -m 'alices original message that she wants to send across the globe to bob' -pk alices_private_key.pem
+
+Bob received the digital envelope and first uses his private asymmetric key to decrypt the symmetric key, he then uses the decrypted key to decrypt the symmetrically encrypted message
+6. python asymmetric_decryption.py -pk bobs_private_key.pem -if alices_encrypted_symmetric_key.txt
+   python symmetric_decryption.py -c a135535c66381bb5e23ecd9b7bde30da06d2d231a035b11280d675ec1d0b65da2e6f288cde45de276f14cb1409319486267df11d4b09af699dd6404f9709cc1740b66da9abbf -k alicesrandosecretkey
+
+Last bob validates the message has not been altered and that it indeed came from Alice
+7/8. python validate_hash.py  -k alices_public_key.pem  -m 'alices original message that she wants to send across the globe to bob' -s 872ed13ea148e29723889305bd00fca0a6d25ba1252bde549fa82a8c8402718b4ba7581029117c6e041613b930d35b9a5aa9cd3a7f99c9e87631d6f5ea1d7b8d0e989d90f14748212c85599334d301694ef1fcd8a402cd0da87e0d0118703b5f46c92caac6783cb0f916256316a7614b539fa5241bc1841d46a1dbd7e984a88bcd85d61e96881d46f1ecb62584ec37e22c5a1f7a6f719e0135e6bca134b081057cd18c79e4e835562f3401ea48d30b52f8709ccf3b583704d7b5699703cdd7f254857bf9d5b32616f21cf9342030fb2172c971e6261d5a1599fdbadd16446b7304376b1fd36ec8fae9ed39cbea52c601def53909eea12f2243abea1709d7eb95
